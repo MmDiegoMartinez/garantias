@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registro de Garantías - CentralCell</title>
+  <link rel="stylesheet" href="css.css">
+  <style>
+    
+
+  </style>
+</head>
+<body>
+
+ <h1>
+  <img src="logo.png" alt="Logo CentralCell">
+  Registro de Garantías - CentralCell
+</h1>
+
+  <nav>
+    <button id="btnForm" class="active">Formulario</button>
+    <button id="btnHistorial">Historial</button>
+    <button id="btnResumen">Resumen</button>
+    <button id="btnExportar">Exportar/Importar</button>
+  </nav> <div class="centrar">
+<div class="for">
+  <!-- Formulario -->
+  <section id="seccionForm" class="active">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre del colaborador:</label>
+        <input type="text" id="nombreManual" placeholder="Escribe un nuevo nombre" />
+      </div>
+      <div class="form-group">
+        <label>Nombre existente:</label>
+        <select id="nombreLista">
+          <option value="">-- Selecciona uno existente --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="sucursal">Sucursal:</label>
+        <select id="sucursal">
+          <option value="20 de noviembre">20 de noviembre</option>
+          <option value="Labotienda">Labotienda</option>
+          <option value="Abastos">Abastos</option>
+          <option value="Plaza Bella">Plaza Bella</option>
+          <option value="Plaza Bonn">Plaza Bonn</option>
+          <option value="Reforma">Reforma</option>
+          <option value="Revistaría">Revistaría</option>
+          <option value="Violetas">Violetas</option>
+          <option value="Nulo">Nuño</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="tipoProducto">Tipo de producto:</label>
+        <select id="tipoProducto">
+          <option value="Hidrogeles">Hidrogeles</option>
+          <option value="Polimeros">Polimeros</option>
+          <option value="Electronicos">Electronicos</option>
+          <option value="Audio">Audio</option>
+          <option value="Caratula">Caratula</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="codigoProducto">Código de producto:</label>
+        <input type="text" id="codigoProducto" placeholder="PLOWS123456" maxlength="11" />
+
+      </div>
+      <div class="form-group">
+        <label for="motivo">Motivo:</label>
+        <select id="motivo">
+          <option value="Mala instalación del producto">Mala instalación del producto</option>
+          <option value="Error de nuevo ingreso">Error de nuevo ingreso</option>
+          <option value="Nuevo - No aviso">Nuevo - No aviso</option>
+          <option value="Garantía">Garantía</option>
+          <option value="Defecto de fábrica">Defecto de fábrica</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" required />
+      </div>
+      <div class="form-group">
+        <label for="merma">Piezas a merma:</label>
+        <input type="number" id="merma" min="1" required />
+      </div>
+    </div>
+
+    <div class="form-row">
+        
+      <button onclick="registrarGarantia()">Registrar Garantía</button>
+    </div>
+
+    <p id="msgGuardado" class="msg-success" style="display:none;">Datos guardados con éxito.</p>
+  </section>
+</div>
+
+ 
+
+  <!-- Historial -->
+  <section id="seccionHistorial">
+    <h2>Historial</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Colaborador</th>
+          <th>Sucursal</th>
+          <th>producto</th>
+          <th>PLOWS</th>
+          <th>Motivo</th>
+          <th>Fecha</th>
+          <th>Piezas a merma</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="historial"></tbody>
+    </table>
+  </section>
+
+  <!-- Resumen -->
+  <section id="seccionResumen">
+    <h2 id="tituloResumen">Resumen por colaborador</h2>
+
+    
+    <input type="date" id="fechaInicio" />
+    <input type="date" id="fechaFin" />
+    <select id="filtroProducto">
+  <option value="">Todos</option>
+  <option value="Hidrogeles">Hidrogeles</option>
+  <option value="Polimeros">Polimeros</option>
+  <option value="Electronicos">Electronicos</option>
+  <option value="Audio">Audio</option>
+  <option value="Caratula">Caratula</option>
+  <option value="Otro">Otro</option>
+</select>
+    <button onclick="filtrarResumen()">Filtrar</button>
+    <button onclick="resetearFiltro()">Limpiar filtro</button>
+
+    <ul id="resumen"></ul>
+  </section>
+
+  <!-- Exportar / Importar -->
+ <section id="seccionExportar">
+    <h2>Respaldo de datos</h2>
+    <label for="exportInicio">Fecha inicio:</label>
+    <input type="date" id="exportInicio" />
+    <label for="exportFin">Fecha fin:</label>
+    <input type="date" id="exportFin" />
+    <button onclick="exportarExcel()">Exportar a Excel</button>
+    <button onclick="exportarDatos()">Exportar historial (JSON)</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarDatos(event)" />
+    <button onclick="document.getElementById('importFile').click()">Importar historial (JSON)</button>
+  </section>
+  </div>
+
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script>
+    document.getElementById("codigoProducto").addEventListener("blur", function () {
+  const valor = this.value;
+  const regex = /^PLOWS\d{6}$/;
+
+  if (!regex.test(valor)) {
+    this.value = "";
+    alert("El código debe empezar con 'PLOWS' seguido de 6 números.");
+  }
+});
+
+    let historial = [];
+
+    const nombreManual = document.getElementById('nombreManual');
+    const nombreLista = document.getElementById('nombreLista');
+    const resumenTitulo = document.getElementById('tituloResumen');
+    const msgGuardado = document.getElementById('msgGuardado');
+
+    // Navegación entre secciones
+    const btnForm = document.getElementById('btnForm');
+    const btnHistorial = document.getElementById('btnHistorial');
+    const btnResumen = document.getElementById('btnResumen');
+    const btnExportar = document.getElementById('btnExportar');
+
+    const seccionForm = document.getElementById('seccionForm');
+    const seccionHistorial = document.getElementById('seccionHistorial');
+    const seccionResumen = document.getElementById('seccionResumen');
+    const seccionExportar = document.getElementById('seccionExportar');
+
+    function activarSeccion(seccion) {
+      // Ocultar todas
+      [seccionForm, seccionHistorial, seccionResumen, seccionExportar].forEach(sec => {
+        sec.classList.remove('active');
+      });
+      // Quitar active de botones
+      [btnForm, btnHistorial, btnResumen, btnExportar].forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Mostrar seleccionado
+      seccion.classList.add('active');
+
+      // Marcar botón activo
+      if (seccion === seccionForm) btnForm.classList.add('active');
+      else if (seccion === seccionHistorial) btnHistorial.classList.add('active');
+      else if (seccion === seccionResumen) btnResumen.classList.add('active');
+      else if (seccion === seccionExportar) btnExportar.classList.add('active');
+    }
+
+    btnForm.onclick = () => activarSeccion(seccionForm);
+    btnHistorial.onclick = () => { activarSeccion(seccionHistorial); actualizarTabla(); };
+    btnResumen.onclick = () => { activarSeccion(seccionResumen); filtrarResumen(); };
+    btnExportar.onclick = () => activarSeccion(seccionExportar);
+
+    nombreManual.addEventListener('input', () => {
+      if (nombreManual.value.trim()) {
+        nombreLista.disabled = true;
+      } else {
+        nombreLista.disabled = false;
+      }
+    });
+
+    nombreLista.addEventListener('change', () => {
+      if (nombreLista.value) {
+        nombreManual.disabled = true;
+      } else {
+        nombreManual.disabled = false;
+      }
+    });
+
+    function guardarLocalStorage() {
+      localStorage.setItem('historialGarantias', JSON.stringify(historial));
+    }
+
+    function cargarLocalStorage() {
+      const datosGuardados = localStorage.getItem('historialGarantias');
+      if (datosGuardados) {
+        historial = JSON.parse(datosGuardados);
+      } else {
+        historial = [];
+      }
+    }
+
+    function registrarGarantia() {
+      let nombre = nombreManual.value.trim();
+      if (!nombre) {
+        nombre = nombreLista.value;
+      }
+      if (!nombre) {
+        alert('Por favor, escribe o selecciona un nombre de colaborador.');
+        return;
+      }
+
+      const sucursal = document.getElementById('sucursal').value;
+       const tipo = document.getElementById('tipoProducto').value;
+        const plows = document.getElementById('codigoProducto').value;
+      const motivo = document.getElementById('motivo').value;
+      const fechaInput = document.getElementById('fecha').value;
+      const merma = parseInt(document.getElementById('merma').value, 10);
+
+      if (!fechaInput) {
+        alert('Por favor, selecciona una fecha.');
+        return;
+      }
+      if (!merma || merma < 1) {
+        alert('Por favor, indica un número válido de piezas a merma.');
+        return;
+      }
+      const fecha = new Date(fechaInput).toISOString().slice(0, 10);
+      // Crear objeto registro
+      const registro = { nombre, sucursal, tipo, plows, motivo, fecha, merma };
+
+      // Añadir al historial
+      historial.push(registro);
+
+      // Guardar en localStorage
+      guardarLocalStorage();
+
+      // Actualizar lista de nombres en select si nuevo nombre
+      if (!Array.from(nombreLista.options).some(opt => opt.value === nombre)) {
+        const opcion = document.createElement('option');
+        opcion.value = nombre;
+        opcion.textContent = nombre;
+        nombreLista.appendChild(opcion);
+      }
+
+      // Limpiar inputs
+      nombreManual.value = '';
+      nombreLista.value = '';
+      nombreManual.disabled = false;
+      nombreLista.disabled = false;
+      document.getElementById('sucursal').value = '20 de noviembre';
+       document.getElementById('tipoProducto').value = 'Hidrogeles';
+       
+        document.getElementById('codigoProducto').value = '';
+      document.getElementById('motivo').value = 'Mala instalación del producto';
+      document.getElementById('fecha').value = '';
+      document.getElementById('merma').value = '';
+
+      // Mostrar mensaje guardado
+      msgGuardado.style.display = 'block';
+      setTimeout(() => msgGuardado.style.display = 'none', 3000);
+    }
+
+    function actualizarTabla() {
+  const tbody = document.getElementById('historial');
+  tbody.innerHTML = '';
+  if (historial.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8">No hay datos registrados.</td></tr>';
+    return;
+  }
+  historial.forEach((registro, index) => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${registro.nombre}</td>
+      <td>${registro.sucursal}</td>
+      <td>${registro.tipo}</td>
+      <td>${registro.plows}</td>
+      <td>${registro.motivo}</td>
+      <td>${registro.fecha}</td>
+      <td>${registro.merma}</td>
+      <td style="text-align:center;">
+        <button onclick="eliminarRegistro(${index})" style="background:none;border:none;cursor:pointer;">
+          <img src="borrar.png" alt="Eliminar" width="24" height="24">
+        </button>
+      </td>
+    `;
+    tbody.appendChild(fila);
+  });
+}
+function eliminarRegistro(indice) {
+  if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+    historial.splice(indice, 1);
+    guardarLocalStorage();
+    actualizarTabla();
+  }
+}
+
+
+    // Filtrar resumen por rango de fechas y mostrar mermas por colaborador
+    function filtrarResumen() {
+  let inicio = document.getElementById('fechaInicio').value;
+  let fin = document.getElementById('fechaFin').value;
+  let tipoProducto = document.getElementById('filtroProducto').value;
+
+  let filtrados = historial;
+
+  if (inicio) {
+    const fechaInicio = new Date(inicio);
+    filtrados = filtrados.filter(r => new Date(r.fecha) >= fechaInicio);
+  }
+  if (fin) {
+    const fechaFin = new Date(fin);
+    fechaFin.setHours(23, 59, 59, 999);
+    filtrados = filtrados.filter(r => new Date(r.fecha) <= fechaFin);
+  }
+
+  if (tipoProducto) {
+    filtrados = filtrados.filter(r => r.tipo === tipoProducto);
+  }
+
+  mostrarResumen(filtrados);
+
+  if (inicio || fin || tipoProducto) {
+    let resumenText = 'Resumen por colaborador';
+    if (inicio || fin) {
+      resumenText += ` del ${inicio || 'inicio'} al ${fin || 'fin'}`;
+    }
+    if (tipoProducto) {
+      resumenText += ` — ${tipoProducto}`;
+    }
+    resumenTitulo.textContent = resumenText;
+  } else {
+    resumenTitulo.textContent = 'Resumen por colaborador';
+  }
+}
+
+    function resetearFiltro() {
+      document.getElementById('fechaInicio').value = '';
+      document.getElementById('fechaFin').value = '';
+      document.getElementById('filtroProducto').value = '';
+      filtrarResumen();
+    }
+
+    function mostrarResumen(datos) {
+      const resumen = {};
+      datos.forEach(({nombre, merma}) => {
+        if (!resumen[nombre]) resumen[nombre] = 0;
+        resumen[nombre] += merma;
+      });
+
+      const ul = document.getElementById('resumen');
+      ul.innerHTML = '';
+
+      if (Object.keys(resumen).length === 0) {
+        ul.innerHTML = '<li>No hay datos para mostrar.</li>';
+        return;
+      }
+
+      for (const nombre in resumen) {
+        const li = document.createElement('li');
+        li.textContent = `${nombre}: ${resumen[nombre]} piezas a merma`;
+        ul.appendChild(li);
+      }
+    }
+
+    // Exportar a Excel usando SheetJS
+   function exportarExcel() {
+      const inicioVal = document.getElementById('exportInicio').value;
+      const finVal = document.getElementById('exportFin').value;
+      if (!inicioVal || !finVal) {
+        alert('Selecciona ambas fechas para exportar.');
+        return;
+      }
+      const filtroInicio = new Date(inicioVal);
+      filtroInicio.setHours(0,0,0,0);
+      const filtroFin = new Date(finVal);
+      filtroFin.setHours(23,59,59,999);
+      if (filtroFin < filtroInicio) {
+        alert('La fecha final no puede ser anterior.');
+        return;
+      }
+      const datosFiltrados = historial.filter(r => {
+        const f = new Date(r.fecha);
+        return f >= filtroInicio && f <= filtroFin;
+      });
+      if (!datosFiltrados.length) {
+        alert('No hay datos en ese rango.');
+        return;
+      }
+      const wb = XLSX.utils.book_new();
+      // Detalle
+      const det = [['Colaborador','Sucursal','tipo','plows','Motivo','Fecha','Piezas a merma']];
+      datosFiltrados.forEach(r=> det.push([r.nombre,r.sucursal,r.tipo,r.plows,r.motivo,r.fecha,r.merma]));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(det), 'Detalle');
+      // Resumen Colaboradores
+const sumCol = {};
+datosFiltrados.forEach(r => {
+  if (!sumCol[r.nombre]) sumCol[r.nombre] = [];
+
+  const existente = sumCol[r.nombre].find(item => item.producto === r.tipo && item.codigo === r.plows);
+  if (existente) {
+    existente.merma += r.merma;
+  } else {
+    sumCol[r.nombre].push({
+      producto: r.tipo,
+      codigo: r.plows,
+      merma: r.merma
+    });
+  }
+});
+
+const arrCol = [['Colaborador', 'Producto', 'Código', 'Total piezas a merma']];
+Object.entries(sumCol).forEach(([colaborador, productos]) => {
+  productos.forEach(p => {
+    arrCol.push([colaborador, p.producto, p.codigo, p.merma]);
+  });
+});
+XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(arrCol), 'Resumen Colaboradores');
+
+// Resumen Sucursales
+const sumSuc = {};
+datosFiltrados.forEach(r => {
+  if (!sumSuc[r.sucursal]) sumSuc[r.sucursal] = [];
+
+  const existente = sumSuc[r.sucursal].find(item => item.producto === r.tipo && item.codigo === r.plows);
+  if (existente) {
+    existente.merma += r.merma;
+  } else {
+    sumSuc[r.sucursal].push({
+      producto: r.tipo,
+      codigo: r.plows,
+      merma: r.merma
+    });
+  }
+});
+
+const arrSuc = [['Sucursal', 'Producto', 'Código', 'Total piezas a merma']];
+Object.entries(sumSuc).forEach(([sucursal, productos]) => {
+  productos.forEach(p => {
+    arrSuc.push([sucursal, p.producto, p.codigo, p.merma]);
+  });
+});
+XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(arrSuc), 'Resumen Sucursales');
+
+// Guardar archivo
+XLSX.writeFile(wb, `Historial_${inicioVal}_a_${finVal}.xlsx`);
+    }
+
+    // Exportar JSON
+    function exportarDatos() {
+      if (historial.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+      }
+      const dataStr = JSON.stringify(historial, null, 2);
+      const blob = new Blob([dataStr], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'historial_garantias.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Importar JSON
+   function importarDatos(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    alert('No se seleccionó ningún archivo.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const datosImportados = JSON.parse(e.target.result);
+      if (!Array.isArray(datosImportados)) {
+        throw new Error("El archivo JSON no tiene el formato correcto (debe ser un array).");
+      }
+
+      // Confirmar antes de sobreescribir
+      if (!confirm('¿Deseas agregar estos registros al historial actual?')) {
+        return;
+      }
+
+      historial = historial.concat(datosImportados);
+      guardarLocalStorage();
+      alert('Datos importados correctamente.');
+    } catch (err) {
+      alert('Error al importar archivo: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+    // Inicializar
+    function inicializar() {
+      cargarLocalStorage();
+
+      // Llenar select nombres
+      const nombresUnicos = [...new Set(historial.map(r => r.nombre))].sort();
+      nombresUnicos.forEach(nombre => {
+        const opcion = document.createElement('option');
+        opcion.value = nombre;
+        opcion.textContent = nombre;
+        nombreLista.appendChild(opcion);
+      });
+
+      actualizarTabla();
+      filtrarResumen();
+    }
+
+    inicializar();
+  </script>
+</body>
+</html>
