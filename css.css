@@ -1,0 +1,188 @@
+body { font-family: Arial; padding: 10px; background-color: #f9f9f9; margin: 0; }
+   
+
+    h1 {
+  color: #d62828;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+h1 img {
+  height: 50px;
+  width: auto;
+}
+    nav { background: #e63946; padding: 10px ; display: flex; gap: 20px; }
+    nav button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 10px 15px;
+      border-bottom: 3px solid transparent;
+      transition: border-color 0.3s;
+    }
+    nav button.active {
+      border-bottom: 3px solid white;
+      font-weight: bold;
+    }
+    section {
+      margin-top: 20px;
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    label, input, select, button {
+      margin-top: 10px; 
+      display: block;
+    }
+    input, select {
+      padding: 6px; 
+      width: 250px;
+      max-width: 100%;
+    }
+    button {
+      margin-top: 15px; 
+      padding: 10px 20px;
+      background-color: #d62828;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 15px;
+    }
+    button:hover {
+      background-color: #b71c1c;
+    }
+    table {
+      width: 100%; 
+      margin-top: 20px; 
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc; 
+      padding: 8px; 
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+    ul#resumen {
+      margin-top: 15px;
+      padding-left: 20px;
+    }
+    .msg-success {
+      color: green;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  
+  .centrar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    text-align: center;
+  }
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  flex: 1 1 calc(50% - 10px);
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-group {
+    flex: 1 1 100%;
+  }
+
+  input, select {
+    width: 100%;
+  }
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+
+  td {
+    border: none;
+    padding: 8px 0;
+    text-align: right;
+    position: relative;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 50%;
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  nav button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
